@@ -10,6 +10,7 @@ import lombok.EqualsAndHashCode;
 
 @Entity
 @Data
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Gasto {
 	
 	@Id
@@ -21,12 +22,12 @@ public class Gasto {
 	private Double valor;
 
 	@Column
-	private String formaPagamento;
+	private FormaPagamentoENUM formaPagamento;
 
-	@Column
+	@Column(length = 11)
 	private String data;
 	
-	@Column
+	@Column(length = 60)
 	private String local;
 
 	@Column
