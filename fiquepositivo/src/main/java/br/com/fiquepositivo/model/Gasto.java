@@ -1,5 +1,7 @@
 package br.com.fiquepositivo.model;
 
+import java.time.LocalDate;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -24,8 +26,8 @@ public class Gasto {
 	@Column
 	private FormaPagamentoENUM formaPagamento;
 
-	@Column(length = 11)
-	private String data;
+	@Column
+	private LocalDate data;
 	
 	@Column(length = 60)
 	private String local;
