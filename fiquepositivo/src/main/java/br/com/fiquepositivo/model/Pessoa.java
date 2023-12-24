@@ -10,6 +10,7 @@ import lombok.EqualsAndHashCode;
 
 @Entity
 @Data
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Pessoa {
 	
 	@Id
@@ -17,13 +18,13 @@ public class Pessoa {
 	@EqualsAndHashCode.Include
 	private Integer idPessoa;
 	
-	@Column(nullable = false)
+	@Column(nullable = false, length = 60)
 	private String nome;
 	
 	@Column(nullable = false)
 	private Double RendaMensal;
 	
-	@Column
+	@Column(length = 60)
 	private String profissao;
 	
 	
