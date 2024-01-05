@@ -16,7 +16,7 @@ public class Pessoa {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@EqualsAndHashCode.Include
-	private Integer idPessoa;
+	private Integer id;
 	
 	@Column(nullable = false, length = 60)
 	private String nome;

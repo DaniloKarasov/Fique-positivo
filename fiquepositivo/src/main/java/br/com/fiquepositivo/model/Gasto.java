@@ -20,7 +20,7 @@ public class Gasto {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@EqualsAndHashCode.Include
-	private Integer idGasto;
+	private Integer id;
 	
 	@Column(nullable = false)
 	private Double valor;
