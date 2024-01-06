@@ -28,9 +28,9 @@ public class CadastroPessoaService {
 			pessoaRepository.delete(pessoa.get());
 			
 		} catch (DataIntegrityViolationException e) {
-			throw new ConflitoDeDadosException(String.format("A pessoa com o id = %s não pode ser excluída porque existe gasto/s vinculado/s a ela.", pessoaId));
+			throw new ConflitoDeDadosException(String.format("A pessoa com o id %s não pode ser excluída porque existe gasto/s vinculado/s a ela.", pessoaId));
 		} catch (NoSuchElementException e) {
-			throw new IdNaoCadastradoException(String.format("A pessoa com o id = %s não existe", pessoaId));
+			throw new IdNaoCadastradoException(String.format("A pessoa com o id %s não existe", pessoaId));
 		}
 	}
 }
