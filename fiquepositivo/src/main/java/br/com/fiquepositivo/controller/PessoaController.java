@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.fiquepositivo.exceptions.ConflitoDeDadosException;
+import br.com.fiquepositivo.exceptions.IdNaoCadastradoException;
 import br.com.fiquepositivo.model.Pessoa;
 import br.com.fiquepositivo.repository.PessoaRepository;
 import br.com.fiquepositivo.service.CadastroPessoaService;
@@ -51,7 +54,14 @@ public class PessoaController {
 	}
 	
 	@DeleteMapping("/{pessoaId}")
-	public void excluir(@PathVariable Integer pessoaId) {
-		cadastroPessoaService.excluir(pessoaId);
+	public ResponseEntity<?> excluir(@PathVariable Integer pessoaId) {
+		try{
+			cadastroPessoaService.excluir(pessoaId);
+			return ResponseEntity.noContent().build();
+		} catch(ConflitoDeDadosException e) {
+			return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+		} catch(IdNaoCadastradoException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+		}
 	}
 }
