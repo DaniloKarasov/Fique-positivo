@@ -1,6 +1,5 @@
 package br.com.fiquepositivo.service;
 
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +12,7 @@ import br.com.fiquepositivo.model.Pessoa;
 import br.com.fiquepositivo.repository.PessoaRepository;
 
 @Service
-public class CadastroPessoaService {
+public class PessoaService {
 	
 	@Autowired
 	private PessoaRepository pessoaRepository;
@@ -25,12 +24,14 @@ public class CadastroPessoaService {
 	public void excluir(Integer pessoaId) {
 		try {
 			Optional<Pessoa> pessoa = pessoaRepository.findById(pessoaId);
-			pessoaRepository.delete(pessoa.get());
+			if(pessoa.isPresent()) {
+				pessoaRepository.delete(pessoa.get());
+			} else {
+				throw new IdNaoCadastradoException(String.format("Não existe pessoa com id %s.", pessoaId));
+			}
 			
 		} catch (DataIntegrityViolationException e) {
 			throw new ConflitoDeDadosException(String.format("A pessoa com o id %s não pode ser excluída porque existe gasto/s vinculado/s a ela.", pessoaId));
-		} catch (NoSuchElementException e) {
-			throw new IdNaoCadastradoException(String.format("A pessoa com o id %s não existe", pessoaId));
 		}
 	}
 }

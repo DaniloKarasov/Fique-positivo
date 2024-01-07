@@ -20,7 +20,7 @@ import br.com.fiquepositivo.exceptions.ConflitoDeDadosException;
 import br.com.fiquepositivo.exceptions.IdNaoCadastradoException;
 import br.com.fiquepositivo.model.Pessoa;
 import br.com.fiquepositivo.repository.PessoaRepository;
-import br.com.fiquepositivo.service.CadastroPessoaService;
+import br.com.fiquepositivo.service.PessoaService;
 
 @RestController
 @RequestMapping("/pessoas")
@@ -30,7 +30,7 @@ public class PessoaController {
 	private PessoaRepository pessoaRepository;
 	
 	@Autowired
-	private CadastroPessoaService cadastroPessoaService;
+	private PessoaService pessoaService;
 	
 	@GetMapping
 	public List<Pessoa> listar() {
@@ -50,17 +50,17 @@ public class PessoaController {
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	public Pessoa adicionar(@RequestBody Pessoa pessoa) {
-		return cadastroPessoaService.salvar(pessoa);
+		return pessoaService.salvar(pessoa);
 	}
 	
 	@DeleteMapping("/{pessoaId}")
-	public ResponseEntity<?> excluir(@PathVariable Integer pessoaId) {
-		try{
-			cadastroPessoaService.excluir(pessoaId);
+	public ResponseEntity<String> excluir(@PathVariable Integer pessoaId) {
+		try {
+			pessoaService.excluir(pessoaId);
 			return ResponseEntity.noContent().build();
-		} catch(ConflitoDeDadosException e) {
+		} catch (ConflitoDeDadosException e) {
 			return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
-		} catch(IdNaoCadastradoException e) {
+		} catch (IdNaoCadastradoException e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
 		}
 	}
