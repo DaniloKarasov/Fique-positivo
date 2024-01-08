@@ -4,10 +4,8 @@ import java.util.Optional;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
-import br.com.fiquepositivo.exceptions.ChaveEstrangeiraInvalidaException;
 import br.com.fiquepositivo.exceptions.IdNaoCadastradoException;
 import br.com.fiquepositivo.model.Gasto;
 import br.com.fiquepositivo.model.Pessoa;
@@ -24,11 +22,13 @@ public class GastoService {
 	private PessoaRepository pessoaRepository;
 	
 	public Gasto salvar(Gasto gasto) {
-		try {
-			return gastoRepository.save(gasto);
-		} catch (DataIntegrityViolationException e) {
-			throw new ChaveEstrangeiraInvalidaException("Não existe pessoa com o id informado.");
+		Integer pessoaId = gasto.getPessoa().getId();
+		Optional<Pessoa> pessoa = pessoaRepository.findById(pessoaId);
+		if(pessoa.isEmpty()) {
+			throw new IdNaoCadastradoException(String.format("Não existe pessoa com id %s", pessoaId));
 		}
+			return gastoRepository.save(gasto);
+		
 	}
 	
 	public Gasto atualizar(Integer gastoId, Gasto gastoAtualizado) {

@@ -51,7 +51,7 @@ public class GastoController {
 		try {
 			gasto = gastoService.salvar(gasto);
 			return ResponseEntity.status(HttpStatus.CREATED).body(gasto);
-		} catch (ChaveEstrangeiraInvalidaException e) {
+		} catch (IdNaoCadastradoException e) {
 			return ResponseEntity.badRequest().body(e.getMessage());
 		}
 	}
