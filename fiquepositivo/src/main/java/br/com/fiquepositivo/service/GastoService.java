@@ -10,13 +10,18 @@ import org.springframework.stereotype.Service;
 import br.com.fiquepositivo.exceptions.ChaveEstrangeiraInvalidaException;
 import br.com.fiquepositivo.exceptions.IdNaoCadastradoException;
 import br.com.fiquepositivo.model.Gasto;
+import br.com.fiquepositivo.model.Pessoa;
 import br.com.fiquepositivo.repository.GastoRepository;
+import br.com.fiquepositivo.repository.PessoaRepository;
 
 @Service
 public class GastoService {
 	
 	@Autowired
 	private GastoRepository gastoRepository;
+	
+	@Autowired
+	private PessoaRepository pessoaRepository;
 	
 	public Gasto salvar(Gasto gasto) {
 		try {
@@ -29,6 +34,11 @@ public class GastoService {
 	public Gasto atualizar(Integer gastoId, Gasto gastoAtualizado) {
 		Optional<Gasto> gastoExistente = gastoRepository.findById(gastoId);
 		if(gastoExistente.isPresent()) {
+			Integer pessoaId = gastoAtualizado.getPessoa().getId();
+			Optional<Pessoa> pessoa = pessoaRepository.findById(pessoaId);
+			if(pessoa.isEmpty()) {
+				throw new IdNaoCadastradoException(String.format("Não existe pessoa com id %s", pessoaId));
+			}
 			BeanUtils.copyProperties(gastoAtualizado, gastoExistente.get(), "id");
 			return salvar(gastoExistente.get());
 		} else {
