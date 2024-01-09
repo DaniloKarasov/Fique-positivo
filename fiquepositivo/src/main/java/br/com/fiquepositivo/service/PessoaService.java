@@ -2,6 +2,7 @@ package br.com.fiquepositivo.service;
 
 import java.util.Optional;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,16 @@ public class PessoaService {
 	
 	public Pessoa salvar(Pessoa pessoa) {
 		return pessoaRepository.save(pessoa);
+	}
+	
+	public Pessoa atualizar(Integer pessoaId, Pessoa pessoa) {
+		Optional<Pessoa> pessoaExistente = pessoaRepository.findById(pessoaId);
+		if(pessoaExistente.isPresent()) {
+			BeanUtils.copyProperties(pessoa, pessoaExistente.get(), "id");
+			return salvar(pessoaExistente.get());
+		} else {
+			throw new IdNaoCadastradoException(String.format("Não existe pessoa com id %s.", pessoaId));
+		}
 	}
 	
 	public void excluir(Integer pessoaId) {
