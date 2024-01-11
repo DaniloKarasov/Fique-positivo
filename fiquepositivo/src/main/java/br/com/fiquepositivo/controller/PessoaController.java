@@ -1,6 +1,7 @@
 package br.com.fiquepositivo.controller;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -58,6 +60,16 @@ public class PessoaController {
 		try {
 			pessoa = pessoaService.atualizar(pessoaId, pessoa);
 			return ResponseEntity.ok(pessoa);	
+		} catch (IdNaoCadastradoException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+		}
+	}
+	
+	@PatchMapping("/{pessoaId}")
+	public ResponseEntity<?> atualizarParcialmente (@PathVariable Integer pessoaId, @RequestBody Map<String, Object> dados) {
+		try {
+			Pessoa pessoa = pessoaService.atualizarParcialmente(pessoaId, dados);
+			return ResponseEntity.ok(pessoa);
 		} catch (IdNaoCadastradoException e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
 		}
