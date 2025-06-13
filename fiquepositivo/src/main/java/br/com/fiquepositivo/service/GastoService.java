@@ -1,9 +1,11 @@
 package br.com.fiquepositivo.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import br.com.fiquepositivo.exceptions.IdNaoCadastradoException;
@@ -11,6 +13,7 @@ import br.com.fiquepositivo.model.Gasto;
 import br.com.fiquepositivo.model.Pessoa;
 import br.com.fiquepositivo.repository.GastoRepository;
 import br.com.fiquepositivo.repository.PessoaRepository;
+import org.springframework.web.bind.annotation.PathVariable;
 
 @Service
 public class GastoService {
@@ -20,6 +23,19 @@ public class GastoService {
 	
 	@Autowired
 	private PessoaRepository pessoaRepository;
+
+	public List<Gasto> listar(){
+		return gastoRepository.findAll();
+	}
+
+	public ResponseEntity<Gasto> buscar(Integer gastoId) {
+		Optional<Gasto> gasto = gastoRepository.findById(gastoId);
+		if(gasto.isPresent()) {
+			return ResponseEntity.ok(gasto.get());
+		} else {
+			return ResponseEntity.notFound().build();
+		}
+	}
 	
 	public Gasto salvar(Gasto gasto) {
 		Integer pessoaId = gasto.getPessoa().getId();

@@ -1,12 +1,14 @@
 package br.com.fiquepositivo.service;
 
 import java.lang.reflect.Field;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ReflectionUtils;
 
@@ -16,12 +18,26 @@ import br.com.fiquepositivo.exceptions.ConflitoDeDadosException;
 import br.com.fiquepositivo.exceptions.IdNaoCadastradoException;
 import br.com.fiquepositivo.model.Pessoa;
 import br.com.fiquepositivo.repository.PessoaRepository;
+import org.springframework.web.bind.annotation.PathVariable;
 
 @Service
 public class PessoaService {
 	
 	@Autowired
 	private PessoaRepository pessoaRepository;
+
+	public List<Pessoa> listar() {
+		return pessoaRepository.findAll();
+	}
+
+	public ResponseEntity<Pessoa> buscar(Integer pessoaId) {
+		Optional<Pessoa> pessoa = pessoaRepository.findById(pessoaId);
+		if(pessoa.isPresent()) {
+			return ResponseEntity.ok(pessoa.get());
+		} else {
+			return ResponseEntity.notFound().build();
+		}
+	}
 	
 	public Pessoa salvar(Pessoa pessoa) {
 		return pessoaRepository.save(pessoa);

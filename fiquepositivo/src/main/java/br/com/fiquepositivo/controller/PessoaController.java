@@ -29,24 +29,16 @@ import br.com.fiquepositivo.service.PessoaService;
 public class PessoaController {
 	
 	@Autowired
-	private PessoaRepository pessoaRepository;
-	
-	@Autowired
 	private PessoaService pessoaService;
 	
 	@GetMapping
 	public List<Pessoa> listar() {
-		return pessoaRepository.findAll();
+		return pessoaService.listar();
 	}
 	
 	@GetMapping("/{pessoaId}")
 	public ResponseEntity<Pessoa> buscar(@PathVariable Integer pessoaId) {
-		Optional<Pessoa> pessoa = pessoaRepository.findById(pessoaId);
-		if(pessoa.isPresent()) {
-			return ResponseEntity.ok(pessoa.get());
-		} else {
-			return ResponseEntity.notFound().build();
-		}
+		return pessoaService.buscar(pessoaId);
 	}
 	
 	@PostMapping

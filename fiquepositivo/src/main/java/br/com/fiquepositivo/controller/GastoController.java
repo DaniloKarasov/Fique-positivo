@@ -23,26 +23,18 @@ import br.com.fiquepositivo.service.GastoService;
 @RestController
 @RequestMapping("/gastos")
 public class GastoController {
-	
-	@Autowired
-	private GastoRepository gastoRepository;
-	
+
 	@Autowired
 	private GastoService gastoService;
 	
 	@GetMapping
 	public List<Gasto> listar() {
-		return gastoRepository.findAll();
+		return gastoService.listar();
 	}
 	
 	@GetMapping("/{gastoId}")
 	public ResponseEntity<Gasto> buscar(@PathVariable Integer gastoId) {
-		Optional<Gasto> gasto = gastoRepository.findById(gastoId);
-		if(gasto.isPresent()) {
-			return ResponseEntity.ok(gasto.get());
-		} else {
-			return ResponseEntity.notFound().build();
-		}
+		return gastoService.buscar(gastoId);
 	}
 	
 	@PostMapping
