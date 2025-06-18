@@ -27,8 +27,12 @@ public class PessoaController {
     }
 
     @GetMapping("/{pessoaId}")
-    public ResponseEntity<Pessoa> buscar(@PathVariable Integer pessoaId) {
-        return pessoaService.buscar(pessoaId);
+    public ResponseEntity<?> buscar(@PathVariable Integer pessoaId) {
+        try {
+            return ResponseEntity.ok(pessoaService.buscar(pessoaId));
+        } catch (IdNaoCadastradoException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
     }
 
     @PostMapping
@@ -48,7 +52,8 @@ public class PessoaController {
     }
 
     @PatchMapping("/{pessoaId}")
-    public ResponseEntity<?> atualizarParcialmente(@PathVariable Integer pessoaId, @RequestBody Map<String, Object> dados) {
+    public ResponseEntity<?> atualizarParcialmente(@PathVariable Integer pessoaId,
+                                                   @RequestBody Map<String, Object> dados) {
         try {
             Pessoa pessoa = pessoaService.atualizarParcialmente(pessoaId, dados);
             return ResponseEntity.ok(pessoa);

@@ -29,13 +29,9 @@ public class PessoaService {
         return pessoaRepository.findAll();
     }
 
-    public ResponseEntity<Pessoa> buscar(Integer pessoaId) {
-        Optional<Pessoa> pessoa = pessoaRepository.findById(pessoaId);
-        if (pessoa.isPresent()) {
-            return ResponseEntity.ok(pessoa.get());
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    public Pessoa buscar(Integer pessoaId) {
+        return pessoaRepository.findById(pessoaId).orElseThrow(
+                () -> new IdNaoCadastradoException(String.format("Não existe pessoa com id %s.", pessoaId)));
     }
 
     public Pessoa salvar(Pessoa pessoa) {

@@ -1,5 +1,6 @@
 package br.com.fiquepositivo.controller;
 
+import br.com.fiquepositivo.exceptions.IdNaoCadastradoException;
 import br.com.fiquepositivo.model.Pessoa;
 import br.com.fiquepositivo.service.PessoaService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -48,12 +49,24 @@ class PessoaControllerTest {
 
     @Test
     void testBuscar() throws Exception {
-        Pessoa pessoa = new Pessoa(3, "Murilo", 2500.0, "Pedreiro");
+        Integer id = 3;
+        Pessoa pessoa = new Pessoa(id, "Murilo", 2500.0, "Pedreiro");
 
-        when(pessoaService.buscar(3)).thenReturn(ResponseEntity.ok(pessoa));
+        when(pessoaService.buscar(id)).thenReturn(pessoa);
 
-        mockMvc.perform(get("/pessoas/3"))
+        mockMvc.perform(get("/pessoas/{id}", id))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(pessoa)));
+    }
+
+    @Test
+    void testBuscarNaoEncontrado() throws Exception {
+        Integer idFalse = 5;
+
+        when(pessoaService.buscar(idFalse)).thenThrow(
+                new IdNaoCadastradoException(String.format("Não existe pessoa com id %s.", idFalse)));
+
+        mockMvc.perform(get("/pessoas/{idFalse}", idFalse)).andExpect(status().isNotFound())
+                .andExpect(content().string(String.format("Não existe pessoa com id %s.", idFalse)));
     }
 }
