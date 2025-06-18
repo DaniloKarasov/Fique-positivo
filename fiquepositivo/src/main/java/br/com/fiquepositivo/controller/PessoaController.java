@@ -48,8 +48,7 @@ public class PessoaController {
     }
 
     @PatchMapping("/{pessoaId}")
-    public ResponseEntity<?> atualizarParcialmente(@PathVariable Integer pessoaId,
-                                                   @RequestBody Map<String, Object> dados) {
+    public ResponseEntity<?> atualizarParcialmente(@PathVariable Integer pessoaId, @RequestBody Map<String, Object> dados) {
         try {
             Pessoa pessoa = pessoaService.atualizarParcialmente(pessoaId, dados);
             return ResponseEntity.ok(pessoa);
