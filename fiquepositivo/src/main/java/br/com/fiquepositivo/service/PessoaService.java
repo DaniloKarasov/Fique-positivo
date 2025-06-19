@@ -39,42 +39,31 @@ public class PessoaService {
     }
 
     public Pessoa atualizar(Integer pessoaId, Pessoa pessoa) {
-        Optional<Pessoa> pessoaExistente = pessoaRepository.findById(pessoaId);
-        if (pessoaExistente.isPresent()) {
-            BeanUtils.copyProperties(pessoa, pessoaExistente.get(), "id");
-            return salvar(pessoaExistente.get());
-        } else {
-            throw new IdNaoCadastradoException(String.format("Não existe pessoa com id %s.", pessoaId));
-        }
+        Pessoa pessoaExistente = buscar(pessoaId);
+            BeanUtils.copyProperties(pessoa, pessoaExistente, "id");
+            return salvar(pessoaExistente);
     }
 
     public Pessoa atualizarParcialmente(Integer pessoaId, Map<String, Object> dados) {
-        Optional<Pessoa> pessoaExistente = pessoaRepository.findById(pessoaId);
+        Pessoa pessoaExistente = buscar(pessoaId);
         ObjectMapper objectMapper = new ObjectMapper();
         Pessoa pessoaDados = objectMapper.convertValue(dados, Pessoa.class);
-        if (pessoaExistente.isPresent()) {
+
             dados.forEach((nomeAtributo, valorAtributo) -> {
                 Field field = ReflectionUtils.findField(Pessoa.class, nomeAtributo);
                 field.setAccessible(true);
 
                 Object valorConvertido = ReflectionUtils.getField(field, pessoaDados);
-                ReflectionUtils.setField(field, pessoaExistente.get(), valorConvertido);
+                ReflectionUtils.setField(field, pessoaExistente, valorConvertido);
 
             });
-            return atualizar(pessoaId, pessoaExistente.get());
-        } else {
-            throw new IdNaoCadastradoException(String.format("Não existe pessoa com id %s.", pessoaId));
-        }
+            return atualizar(pessoaId, pessoaExistente);
     }
 
     public void excluir(Integer pessoaId) {
         try {
-            Optional<Pessoa> pessoa = pessoaRepository.findById(pessoaId);
-            if (pessoa.isPresent()) {
-                pessoaRepository.delete(pessoa.get());
-            } else {
-                throw new IdNaoCadastradoException(String.format("Não existe pessoa com id %s.", pessoaId));
-            }
+            Pessoa pessoa = buscar(pessoaId);
+            pessoaRepository.delete(pessoa);
 
         } catch (DataIntegrityViolationException e) {
             throw new ConflitoDeDadosException(
