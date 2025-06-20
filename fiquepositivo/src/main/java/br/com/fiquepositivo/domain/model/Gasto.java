@@ -1,35 +1,48 @@
-package br.com.fiquepositivo.model;
+package br.com.fiquepositivo.domain.model;
+
+import java.time.LocalDate;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 
 @Entity
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class Pessoa {
+public class Gasto {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@EqualsAndHashCode.Include
 	private Integer id;
 	
-	@Column(nullable = false, length = 60)
-	private String nome;
-	
 	@Column(nullable = false)
-	private Double RendaMensal;
+	private Double valor;
+
+	@Column
+	private FormaPagamentoENUM formaPagamento;
+
+	@Column
+	private LocalDate data;
 	
 	@Column(length = 60)
-	private String profissao;
+	private String local;
+
+	@Column
+	private String descricao;
+	
+	@Column
+	private Boolean necessidade;
+	
+	@JoinColumn(nullable = false)
+	@ManyToOne
+	private Pessoa pessoa;
 	
 	
 }

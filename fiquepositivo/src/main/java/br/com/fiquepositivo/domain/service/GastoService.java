@@ -1,10 +1,10 @@
-package br.com.fiquepositivo.service;
+package br.com.fiquepositivo.domain.service;
 
-import br.com.fiquepositivo.exceptions.IdNaoCadastradoException;
-import br.com.fiquepositivo.model.Gasto;
-import br.com.fiquepositivo.model.Pessoa;
-import br.com.fiquepositivo.repository.GastoRepository;
-import br.com.fiquepositivo.repository.PessoaRepository;
+import br.com.fiquepositivo.domain.exceptions.IdNaoCadastradoException;
+import br.com.fiquepositivo.domain.model.Gasto;
+import br.com.fiquepositivo.domain.model.Pessoa;
+import br.com.fiquepositivo.domain.repository.GastoRepository;
+import br.com.fiquepositivo.domain.repository.PessoaRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;

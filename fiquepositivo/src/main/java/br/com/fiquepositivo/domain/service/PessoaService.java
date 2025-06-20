@@ -1,20 +1,18 @@
-package br.com.fiquepositivo.service;
+package br.com.fiquepositivo.domain.service;
 
-import br.com.fiquepositivo.exceptions.ConflitoDeDadosException;
-import br.com.fiquepositivo.exceptions.IdNaoCadastradoException;
-import br.com.fiquepositivo.model.Pessoa;
-import br.com.fiquepositivo.repository.PessoaRepository;
+import br.com.fiquepositivo.domain.exceptions.ConflitoDeDadosException;
+import br.com.fiquepositivo.domain.exceptions.IdNaoCadastradoException;
+import br.com.fiquepositivo.domain.model.Pessoa;
+import br.com.fiquepositivo.domain.repository.PessoaRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Service
 public class PessoaService {
@@ -40,8 +38,8 @@ public class PessoaService {
 
     public Pessoa atualizar(Integer pessoaId, Pessoa pessoa) {
         Pessoa pessoaExistente = buscar(pessoaId);
-            BeanUtils.copyProperties(pessoa, pessoaExistente, "id");
-            return salvar(pessoaExistente);
+        BeanUtils.copyProperties(pessoa, pessoaExistente, "id");
+        return salvar(pessoaExistente);
     }
 
     public Pessoa atualizarParcialmente(Integer pessoaId, Map<String, Object> dados) {
@@ -49,15 +47,15 @@ public class PessoaService {
         ObjectMapper objectMapper = new ObjectMapper();
         Pessoa pessoaDados = objectMapper.convertValue(dados, Pessoa.class);
 
-            dados.forEach((nomeAtributo, valorAtributo) -> {
-                Field field = ReflectionUtils.findField(Pessoa.class, nomeAtributo);
-                field.setAccessible(true);
+        dados.forEach((nomeAtributo, valorAtributo) -> {
+            Field field = ReflectionUtils.findField(Pessoa.class, nomeAtributo);
+            field.setAccessible(true);
 
-                Object valorConvertido = ReflectionUtils.getField(field, pessoaDados);
-                ReflectionUtils.setField(field, pessoaExistente, valorConvertido);
+            Object valorConvertido = ReflectionUtils.getField(field, pessoaDados);
+            ReflectionUtils.setField(field, pessoaExistente, valorConvertido);
 
-            });
-            return atualizar(pessoaId, pessoaExistente);
+        });
+        return atualizar(pessoaId, pessoaExistente);
     }
 
     public void excluir(Integer pessoaId) {

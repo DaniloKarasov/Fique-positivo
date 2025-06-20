@@ -1,8 +1,9 @@
 package br.com.fiquepositivo.controller;
 
-import br.com.fiquepositivo.exceptions.IdNaoCadastradoException;
-import br.com.fiquepositivo.model.Pessoa;
-import br.com.fiquepositivo.service.PessoaService;
+import br.com.fiquepositivo.api.controller.PessoaController;
+import br.com.fiquepositivo.domain.exceptions.IdNaoCadastradoException;
+import br.com.fiquepositivo.domain.model.Pessoa;
+import br.com.fiquepositivo.domain.service.PessoaService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

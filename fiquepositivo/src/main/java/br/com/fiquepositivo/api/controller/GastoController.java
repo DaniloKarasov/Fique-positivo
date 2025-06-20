@@ -1,8 +1,8 @@
-package br.com.fiquepositivo.controller;
+package br.com.fiquepositivo.api.controller;
 
-import br.com.fiquepositivo.exceptions.IdNaoCadastradoException;
-import br.com.fiquepositivo.model.Gasto;
-import br.com.fiquepositivo.service.GastoService;
+import br.com.fiquepositivo.domain.exceptions.IdNaoCadastradoException;
+import br.com.fiquepositivo.domain.model.Gasto;
+import br.com.fiquepositivo.domain.service.GastoService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
