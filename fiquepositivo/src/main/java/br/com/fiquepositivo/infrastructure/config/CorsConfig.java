@@ -1,4 +1,4 @@
-package br.com.fiquepositivo.config;
+package br.com.fiquepositivo.infrastructure.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -1,4 +1,4 @@
-package br.com.fiquepositivo.exceptions;
+package br.com.fiquepositivo.domain.exceptions;
 
 public class ConflitoDeDadosException extends RuntimeException {
 

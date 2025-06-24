@@ -1,4 +1,4 @@
-package br.com.fiquepositivo.model;
+package br.com.fiquepositivo.domain.model;
 
 public enum FormaPagamentoENUM {
 
