@@ -1,10 +1,8 @@
 package br.com.fiquepositivo.api.controller;
 
-import br.com.fiquepositivo.domain.exceptions.IdNaoCadastradoException;
 import br.com.fiquepositivo.domain.model.Gasto;
 import br.com.fiquepositivo.domain.service.GastoService;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,37 +23,24 @@ public class GastoController {
     }
 
     @GetMapping("/{gastoId}")
-    public ResponseEntity<Gasto> buscar(@PathVariable Integer gastoId) {
+    public Gasto buscar(@PathVariable Integer gastoId) {
         return gastoService.buscar(gastoId);
     }
 
     @PostMapping
-    public ResponseEntity<?> adicionar(@RequestBody Gasto gasto) {
-        try {
-            gasto = gastoService.salvar(gasto);
-            return ResponseEntity.status(HttpStatus.CREATED).body(gasto);
-        } catch (IdNaoCadastradoException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    @ResponseStatus(HttpStatus.CREATED)
+    public Gasto adicionar(@RequestBody Gasto gasto) {
+        return gastoService.salvar(gasto);
     }
 
     @PutMapping("/{gastoId}")
-    public ResponseEntity<?> atualizar(@PathVariable Integer gastoId, @RequestBody Gasto gasto) {
-        try {
-            gasto = gastoService.atualizar(gastoId, gasto);
-            return ResponseEntity.ok(gasto);
-        } catch (IdNaoCadastradoException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
+    public Gasto atualizar(@PathVariable Integer gastoId, @RequestBody Gasto gasto) {
+        return gastoService.atualizar(gastoId, gasto);
     }
 
     @DeleteMapping("/{gastoId}")
-    public ResponseEntity<?> excluir(@PathVariable Integer gastoId) {
-        try {
-            gastoService.excluir(gastoId);
-            return ResponseEntity.noContent().build();
-        } catch (IdNaoCadastradoException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void excluir(@PathVariable Integer gastoId) {
+        gastoService.excluir(gastoId);
     }
 }

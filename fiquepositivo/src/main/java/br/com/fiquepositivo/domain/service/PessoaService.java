@@ -60,8 +60,7 @@ public class PessoaService {
 
     public void excluir(Integer pessoaId) {
         try {
-            Pessoa pessoa = buscar(pessoaId);
-            pessoaRepository.delete(pessoa);
+            pessoaRepository.delete(buscar(pessoaId));
 
         } catch (DataIntegrityViolationException e) {
             throw new ConflitoDeDadosException(
