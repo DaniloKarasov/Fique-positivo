@@ -1,4 +1,4 @@
-package br.com.fiquepositivo.controller;
+package br.com.fiquepositivo.api.controller;
 
 import br.com.fiquepositivo.api.controller.PessoaController;
 import br.com.fiquepositivo.domain.exceptions.IdNaoCadastradoException;
