@@ -26,7 +26,7 @@ public class Pessoa {
 	private String nome;
 	
 	@Column(nullable = false)
-	private Double RendaMensal;
+	private Double rendaMensal;
 	
 	@Column(length = 60)
 	private String profissao;
