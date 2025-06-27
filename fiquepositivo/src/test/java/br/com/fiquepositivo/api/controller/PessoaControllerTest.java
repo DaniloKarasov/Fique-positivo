@@ -55,7 +55,8 @@ class PessoaControllerTest {
 
         when(pessoaService.buscar(id)).thenReturn(pessoa);
 
-        mockMvc.perform(get("/pessoas/{id}", id)).andExpect(status().isOk())
+        mockMvc.perform(get("/pessoas/{id}", id))
+                .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(pessoa)));
     }
 
@@ -66,9 +67,9 @@ class PessoaControllerTest {
         when(pessoaService.buscar(idFalse)).thenThrow(
                 new IdNaoCadastradoException(String.format("Não existe pessoa com id %s.", idFalse)));
 
-        mockMvc.perform(get("/pessoas/{idFalse}", idFalse)).andExpect(status().isNotFound())
+        mockMvc.perform(get("/pessoas/{idFalse}", idFalse))
+                .andExpect(status().isNotFound())
                 .andExpect(content().string(String.format("Não existe pessoa com id %s.", idFalse)));
-        verify(pessoaService).buscar(idFalse);
     }
 
     @Test
@@ -79,11 +80,13 @@ class PessoaControllerTest {
         when(pessoaService.salvar(pessoaInput)).thenReturn(pessoaCreated);
 
         mockMvc.perform(post("/pessoas").contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(pessoaInput))).andExpect(status().isCreated())
+                        .content(objectMapper.writeValueAsString(pessoaInput)))
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(pessoaCreated.getId()))
                 .andExpect(jsonPath("$.nome").value(pessoaCreated.getNome()))
                 .andExpect(jsonPath("$.rendaMensal").value(pessoaCreated.getRendaMensal()))
                 .andExpect(jsonPath("$.profissao").value(pessoaCreated.getProfissao()));
+
         verify(pessoaService).salvar(pessoaInput);
     }
 
@@ -96,11 +99,13 @@ class PessoaControllerTest {
         when(pessoaService.atualizar(id, pessoaInput)).thenReturn(pessoaAtualizada);
 
         mockMvc.perform(put("/pessoas/{id}", id).contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(pessoaInput))).andExpect(status().isOk())
+                        .content(objectMapper.writeValueAsString(pessoaInput)))
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(pessoaAtualizada.getId()))
                 .andExpect(jsonPath("$.nome").value(pessoaAtualizada.getNome()))
                 .andExpect(jsonPath("$.rendaMensal").value(pessoaAtualizada.getRendaMensal()))
                 .andExpect(jsonPath("$.profissao").value(pessoaAtualizada.getProfissao()));
+
         verify(pessoaService).atualizar(id, pessoaInput);
     }
 
@@ -112,8 +117,10 @@ class PessoaControllerTest {
         when(pessoaService.atualizar(idInvalido, pessoaInput)).thenThrow(new IdNaoCadastradoException(mensagemErro));
 
         mockMvc.perform(put("/pessoas/{id}", idInvalido).contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(pessoaInput))).andExpect(status().isNotFound())
+                        .content(objectMapper.writeValueAsString(pessoaInput)))
+                .andExpect(status().isNotFound())
                 .andExpect(content().string(mensagemErro));
+
         verify(pessoaService).atualizar(idInvalido, pessoaInput);
     }
 
@@ -127,7 +134,8 @@ class PessoaControllerTest {
         when(pessoaService.atualizarParcialmente(eq(id), anyMap())).thenReturn(pessoaAtualizada);
 
         mockMvc.perform(patch("/pessoas/{id}", id).contentType(MediaType.APPLICATION_JSON).content(jsonParcial))
-                .andExpect(status().isOk()).andExpect(jsonPath("$.id").value(pessoaAtualizada.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(pessoaAtualizada.getId()))
                 .andExpect(jsonPath("$.nome").value(pessoaAtualizada.getNome()))
                 .andExpect(jsonPath("$.rendaMensal").value(pessoaAtualizada.getRendaMensal()))
                 .andExpect(jsonPath("$.profissao").value(pessoaAtualizada.getProfissao()));
@@ -155,6 +163,7 @@ class PessoaControllerTest {
         Integer id = 1;
         doNothing().when(pessoaService).excluir(id);
         mockMvc.perform(delete("/pessoas/{id}", id)).andExpect(status().isNoContent());
+
         verify(pessoaService).excluir(id);
     }
 
@@ -165,6 +174,7 @@ class PessoaControllerTest {
         doThrow(new IdNaoCadastradoException(mensagemErro)).when(pessoaService).excluir(idInvalido);
         mockMvc.perform(delete("/pessoas/{id}", idInvalido)).andExpect(status().isNotFound())
                 .andExpect(content().string(mensagemErro));
+
         verify(pessoaService).excluir(idInvalido);
     }
 

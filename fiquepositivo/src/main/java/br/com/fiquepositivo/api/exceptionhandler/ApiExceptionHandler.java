@@ -29,7 +29,7 @@ public class ApiExceptionHandler {
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<String> tratarHttpMessageNotReadableException(HttpMessageNotReadableException e) {
+    public ResponseEntity<String> tratarHttpMessageNotReadableException() {
         return ResponseEntity.badRequest().body("Erro de sintaxe no JSON enviado.");
     }
 
