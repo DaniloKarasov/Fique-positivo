@@ -2,6 +2,7 @@ package br.com.fiquepositivo.api.controller;
 
 import br.com.fiquepositivo.domain.model.Pessoa;
 import br.com.fiquepositivo.domain.service.PessoaService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,7 +31,7 @@ public class PessoaController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Pessoa adicionar(@RequestBody Pessoa pessoa) {
+    public Pessoa adicionar(@RequestBody @Valid Pessoa pessoa) {
         return pessoaService.salvar(pessoa);
     }
 
