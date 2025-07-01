@@ -1,8 +1,10 @@
 package br.com.fiquepositivo.api.controller;
 
+import br.com.fiquepositivo.api.dto.input.PessoaRequest;
+import br.com.fiquepositivo.api.dto.output.PessoaDTO;
+import br.com.fiquepositivo.api.mapper.PessoaMapper;
 import br.com.fiquepositivo.domain.exceptions.ConflitoDeDadosException;
 import br.com.fiquepositivo.domain.exceptions.IdNaoCadastradoException;
-import br.com.fiquepositivo.domain.model.Pessoa;
 import br.com.fiquepositivo.domain.service.PessoaService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -27,6 +29,9 @@ class PessoaControllerTest {
     @MockBean
     private PessoaService pessoaService;
 
+    @MockBean
+    private PessoaMapper pessoaMapper;
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -35,13 +40,13 @@ class PessoaControllerTest {
 
     @Test
     void testListar() throws Exception {
-        Pessoa pessoa1 = new Pessoa(1, "Renato", 3500.0, "Segurança");
-        Pessoa pessoa2 = new Pessoa(2, "Marcelo", 3000.0, "Motorista");
-        List<Pessoa> list = new ArrayList<>();
-        list.add(pessoa1);
-        list.add(pessoa2);
+        PessoaDTO pessoaDto1 = new PessoaDTO(1, "Renato", 3500.0, "Segurança");
+        PessoaDTO pessoaDto2 = new PessoaDTO(2, "Marcelo", 3000.0, "Motorista");
+        List<PessoaDTO> list = new ArrayList<>();
+        list.add(pessoaDto1);
+        list.add(pessoaDto2);
 
-        when(pessoaService.listar()).thenReturn(list);
+        when(pessoaMapper.toDtoList(pessoaService.listar())).thenReturn(list);
 
         mockMvc.perform(get("/pessoas")).andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(list)));
@@ -51,77 +56,82 @@ class PessoaControllerTest {
     @Test
     void testBuscar() throws Exception {
         Integer id = 3;
-        Pessoa pessoa = new Pessoa(id, "Murilo", 2500.0, "Pedreiro");
+        PessoaDTO pessoaDto = new PessoaDTO(id, "Murilo", 2500.0, "Pedreiro");
 
-        when(pessoaService.buscar(id)).thenReturn(pessoa);
+        when(pessoaMapper.toDto(any())).thenReturn(pessoaDto);
 
         mockMvc.perform(get("/pessoas/{id}", id))
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(pessoa)));
+                .andExpect(content().json(objectMapper.writeValueAsString(pessoaDto)));
+
+        verify(pessoaMapper).toDto(any());
     }
 
     @Test
     void testBuscarNaoEncontrado() throws Exception {
         Integer idFalse = 5;
+        String mensagemErro = String.format("Não existe pessoa com id %s.", idFalse);
 
         when(pessoaService.buscar(idFalse)).thenThrow(
-                new IdNaoCadastradoException(String.format("Não existe pessoa com id %s.", idFalse)));
+                new IdNaoCadastradoException(mensagemErro));
 
         mockMvc.perform(get("/pessoas/{idFalse}", idFalse))
                 .andExpect(status().isNotFound())
-                .andExpect(content().string(String.format("Não existe pessoa com id %s.", idFalse)));
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.message").value(mensagemErro));
     }
 
     @Test
     void testAdicionar() throws Exception {
-        Pessoa pessoaInput = new Pessoa(null, "Sara", 2000.0, "Farmaceutica");
-        Pessoa pessoaCreated = new Pessoa(1, "Sara", 2000.0, "Farmaceutica");
+        PessoaRequest pessoaInput = new PessoaRequest("Sara", 2000.0, "Farmaceutica");
+        PessoaDTO pessoaCreated = new PessoaDTO(1, "Sara", 2000.0, "Farmaceutica");
 
-        when(pessoaService.salvar(pessoaInput)).thenReturn(pessoaCreated);
+        when(pessoaMapper.toDto(pessoaService.salvar(pessoaMapper.toEntity(pessoaInput)))).thenReturn(pessoaCreated);
 
         mockMvc.perform(post("/pessoas").contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(pessoaInput)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").value(pessoaCreated.getId()))
-                .andExpect(jsonPath("$.nome").value(pessoaCreated.getNome()))
-                .andExpect(jsonPath("$.rendaMensal").value(pessoaCreated.getRendaMensal()))
-                .andExpect(jsonPath("$.profissao").value(pessoaCreated.getProfissao()));
+                .andExpect(jsonPath("$.id").value(pessoaCreated.id()))
+                .andExpect(jsonPath("$.nome").value(pessoaCreated.nome()))
+                .andExpect(jsonPath("$.rendaMensal").value(pessoaCreated.rendaMensal()))
+                .andExpect(jsonPath("$.profissao").value(pessoaCreated.profissao()));
 
-        verify(pessoaService).salvar(pessoaInput);
     }
 
     @Test
     void testAtualizar() throws Exception {
         Integer id = 1;
-        Pessoa pessoaInput = new Pessoa(null, "Marcelo", 3500.0, "Operador de máquinas");
-        Pessoa pessoaAtualizada = new Pessoa(id, "Marcelo", 3500.0, "Operador de máquinas");
+        PessoaRequest pessoaInput = new PessoaRequest("Marcelo", 3500.0, "Operador de máquinas");
+        PessoaDTO pessoaAtualizada = new PessoaDTO(id, "Marcelo", 3500.0, "Operador de máquinas");
 
-        when(pessoaService.atualizar(id, pessoaInput)).thenReturn(pessoaAtualizada);
+        when(pessoaMapper.toDto(any())).thenReturn(pessoaAtualizada);
 
         mockMvc.perform(put("/pessoas/{id}", id).contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(pessoaInput)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(pessoaAtualizada.getId()))
-                .andExpect(jsonPath("$.nome").value(pessoaAtualizada.getNome()))
-                .andExpect(jsonPath("$.rendaMensal").value(pessoaAtualizada.getRendaMensal()))
-                .andExpect(jsonPath("$.profissao").value(pessoaAtualizada.getProfissao()));
+                .andExpect(jsonPath("$.id").value(pessoaAtualizada.id()))
+                .andExpect(jsonPath("$.nome").value(pessoaAtualizada.nome()))
+                .andExpect(jsonPath("$.rendaMensal").value(pessoaAtualizada.rendaMensal()))
+                .andExpect(jsonPath("$.profissao").value(pessoaAtualizada.profissao()));
 
-        verify(pessoaService).atualizar(id, pessoaInput);
+        verify(pessoaMapper).toDto(any());
+
     }
 
     @Test
     void testAtualizarNaoEncontrado() throws Exception {
         Integer idInvalido = 1;
-        Pessoa pessoaInput = new Pessoa(null, "Marcelo", 3500.0, "Operador de máquinas");
+        PessoaRequest pessoaInput = new PessoaRequest("Marcelo", 3500.0, "Operador de máquinas");
         String mensagemErro = String.format("Não existe pessoa com id %s.", idInvalido);
-        when(pessoaService.atualizar(idInvalido, pessoaInput)).thenThrow(new IdNaoCadastradoException(mensagemErro));
+        when(pessoaMapper.toDto(any())).thenThrow(new IdNaoCadastradoException(mensagemErro));
 
         mockMvc.perform(put("/pessoas/{id}", idInvalido).contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(pessoaInput)))
                 .andExpect(status().isNotFound())
-                .andExpect(content().string(mensagemErro));
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.message").value(mensagemErro));
 
-        verify(pessoaService).atualizar(idInvalido, pessoaInput);
+        verify(pessoaMapper).toDto(any());
     }
 
     @Test
@@ -129,17 +139,18 @@ class PessoaControllerTest {
         Integer id = 1;
         String jsonParcial = "{ \"profissao\": \"Analista\" }";
 
-        Pessoa pessoaAtualizada = new Pessoa(id, "Sara", 2500.0, "Analista");
+        PessoaDTO pessoaAtualizada = new PessoaDTO(id, "Sara", 2500.0, "Analista");
 
-        when(pessoaService.atualizarParcialmente(eq(id), anyMap())).thenReturn(pessoaAtualizada);
+        when(pessoaMapper.toDto(any())).thenReturn(pessoaAtualizada);
 
         mockMvc.perform(patch("/pessoas/{id}", id).contentType(MediaType.APPLICATION_JSON).content(jsonParcial))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(pessoaAtualizada.getId()))
-                .andExpect(jsonPath("$.nome").value(pessoaAtualizada.getNome()))
-                .andExpect(jsonPath("$.rendaMensal").value(pessoaAtualizada.getRendaMensal()))
-                .andExpect(jsonPath("$.profissao").value(pessoaAtualizada.getProfissao()));
+                .andExpect(jsonPath("$.id").value(pessoaAtualizada.id()))
+                .andExpect(jsonPath("$.nome").value(pessoaAtualizada.nome()))
+                .andExpect(jsonPath("$.rendaMensal").value(pessoaAtualizada.rendaMensal()))
+                .andExpect(jsonPath("$.profissao").value(pessoaAtualizada.profissao()));
 
+        verify(pessoaMapper).toDto(any());
         verify(pessoaService).atualizarParcialmente(eq(id), anyMap());
     }
 
@@ -153,7 +164,9 @@ class PessoaControllerTest {
                 new IdNaoCadastradoException(mensagemErro));
 
         mockMvc.perform(patch("/pessoas/{id}", idInvalido).contentType(MediaType.APPLICATION_JSON).content(jsonParcial))
-                .andExpect(status().isNotFound()).andExpect(content().string(mensagemErro));
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.message").value(mensagemErro));
 
         verify(pessoaService).atualizarParcialmente(eq(idInvalido), anyMap());
     }
@@ -173,7 +186,8 @@ class PessoaControllerTest {
         String mensagemErro = String.format("Não existe pessoa com id %s.", idInvalido);
         doThrow(new IdNaoCadastradoException(mensagemErro)).when(pessoaService).excluir(idInvalido);
         mockMvc.perform(delete("/pessoas/{id}", idInvalido)).andExpect(status().isNotFound())
-                .andExpect(content().string(mensagemErro));
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.message").value(mensagemErro));
 
         verify(pessoaService).excluir(idInvalido);
     }
@@ -186,7 +200,8 @@ class PessoaControllerTest {
                         idConflito);
         doThrow(new ConflitoDeDadosException(mensagemErro)).when(pessoaService).excluir(idConflito);
         mockMvc.perform(delete("/pessoas/{id}", idConflito)).andExpect(status().isConflict())
-                .andExpect(content().string(mensagemErro));
+                .andExpect(jsonPath("$.status").value(409))
+                .andExpect(jsonPath("$.message").value(mensagemErro));
         verify(pessoaService).excluir(idConflito);
     }
 }

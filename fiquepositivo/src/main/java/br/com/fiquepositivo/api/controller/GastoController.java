@@ -1,6 +1,8 @@
 package br.com.fiquepositivo.api.controller;
 
-import br.com.fiquepositivo.domain.model.Gasto;
+import br.com.fiquepositivo.api.dto.input.GastoRequest;
+import br.com.fiquepositivo.api.dto.output.GastoDTO;
+import br.com.fiquepositivo.api.mapper.GastoMapper;
 import br.com.fiquepositivo.domain.service.GastoService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -13,29 +15,32 @@ public class GastoController {
 
     private final GastoService gastoService;
 
-    public GastoController(GastoService gastoService) {
+    private final GastoMapper gastoMapper;
+
+    public GastoController(GastoService gastoService, GastoMapper gastoMapper) {
         this.gastoService = gastoService;
+        this.gastoMapper = gastoMapper;
     }
 
     @GetMapping
-    public List<Gasto> listar() {
-        return gastoService.listar();
+    public List<GastoDTO> listar() {
+        return gastoMapper.toDtoList(gastoService.listar());
     }
 
     @GetMapping("/{gastoId}")
-    public Gasto buscar(@PathVariable Integer gastoId) {
-        return gastoService.buscar(gastoId);
+    public GastoDTO buscar(@PathVariable Integer gastoId) {
+        return gastoMapper.toDto(gastoService.buscar(gastoId));
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Gasto adicionar(@RequestBody Gasto gasto) {
-        return gastoService.salvar(gasto);
+    public GastoDTO adicionar(@RequestBody GastoRequest gastoRequest) {
+        return gastoMapper.toDto(gastoService.salvar(gastoMapper.toEntity(gastoRequest)));
     }
 
     @PutMapping("/{gastoId}")
-    public Gasto atualizar(@PathVariable Integer gastoId, @RequestBody Gasto gasto) {
-        return gastoService.atualizar(gastoId, gasto);
+    public GastoDTO atualizar(@PathVariable Integer gastoId, @RequestBody GastoRequest gastoRequest) {
+        return gastoMapper.toDto(gastoService.atualizar(gastoId, gastoMapper.toEntity(gastoRequest)));
     }
 
     @DeleteMapping("/{gastoId}")

@@ -1,5 +1,6 @@
 package br.com.fiquepositivo.api.exceptionhandler;
 
+import br.com.fiquepositivo.api.dto.output.ErrorResponse;
 import br.com.fiquepositivo.domain.exceptions.ConflitoDeDadosException;
 import br.com.fiquepositivo.domain.exceptions.IdNaoCadastradoException;
 import br.com.fiquepositivo.domain.exceptions.PessoaNaoEncontradaException;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,39 +21,49 @@ import java.util.stream.Collectors;
 public class ApiExceptionHandler {
 
     @ExceptionHandler(IdNaoCadastradoException.class)
-    public ResponseEntity<String> tratarIdNaoCadastradoException(IdNaoCadastradoException e) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+    public ResponseEntity<ErrorResponse> tratarIdNaoCadastradoException(IdNaoCadastradoException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(criarErrorResponse(HttpStatus.NOT_FOUND, e.getMessage()));
     }
 
     @ExceptionHandler(ConflitoDeDadosException.class)
-    public ResponseEntity<String> tratarConflitoDeDadosException(ConflitoDeDadosException e) {
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+    public ResponseEntity<ErrorResponse> tratarConflitoDeDadosException(ConflitoDeDadosException e) {
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(criarErrorResponse(HttpStatus.CONFLICT, e.getMessage()));
     }
 
     @ExceptionHandler(PessoaNaoEncontradaException.class)
-    public ResponseEntity<String> tratarPessoaNaoEncontradaException(PessoaNaoEncontradaException e) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+    public ResponseEntity<ErrorResponse> tratarPessoaNaoEncontradaException(PessoaNaoEncontradaException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(criarErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage()));
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<String> tratarHttpMessageNotReadableException() {
-        return ResponseEntity.badRequest().body("Erro de sintaxe no JSON enviado.");
+    public ResponseEntity<ErrorResponse> tratarHttpMessageNotReadableException() {
+        return ResponseEntity.badRequest()
+                .body(criarErrorResponse(HttpStatus.BAD_REQUEST, "Erro de sintaxe no JSON enviado."));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<List<String>> tratarMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+    public ResponseEntity<ErrorResponse> tratarMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         List<String> mensagens = e.getBindingResult()
                 .getFieldErrors()
                 .stream()
                 .map(FieldError::getDefaultMessage)
                 .collect(Collectors.toList());
-        return ResponseEntity.badRequest().body(mensagens);
+        String mensagem = String.join(" ", mensagens);
+        return ResponseEntity.badRequest().body(criarErrorResponse(HttpStatus.BAD_REQUEST, mensagem));
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<String> tratarDataIntegrityViolationException(DataIntegrityViolationException e) {
+    public ResponseEntity<ErrorResponse> tratarDataIntegrityViolationException(DataIntegrityViolationException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Um ou mais campos obrigatórios não foram preenchidos ou os dados são inconsistentes.");
+                .body(criarErrorResponse(HttpStatus.BAD_REQUEST,
+                        "Um ou mais campos obrigatórios não foram preenchidos ou os dados são inconsistentes."));
+    }
+
+    private ErrorResponse criarErrorResponse(HttpStatus status, String message) {
+        return new ErrorResponse(status.value(), message, LocalDateTime.now());
     }
 
 }

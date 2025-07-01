@@ -24,7 +24,7 @@ public class Gasto {
     private Double valor;
 
     @Column
-    private FormaPagamentoENUM formaPagamento;
+    private FormaPagamento formaPagamento;
 
     @Column
     private LocalDate data;

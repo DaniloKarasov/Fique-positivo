@@ -1,5 +1,6 @@
 package br.com.fiquepositivo.api.controller;
 
+import br.com.fiquepositivo.api.mapper.GastoMapper;
 import br.com.fiquepositivo.domain.service.GastoService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,9 @@ class GastoControllerTest {
 
     @MockBean
     GastoService gastoService;
+
+    @MockBean
+    GastoMapper gastoMapper;
 
     @Test
     void testListar() {
