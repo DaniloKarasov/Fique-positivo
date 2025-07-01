@@ -54,7 +54,6 @@ class ApiExceptionHandlerTest {
 
         mockMvc.perform(post("/pessoas")              // ajuste a URL conforme seu endpoint
                         .contentType(MediaType.APPLICATION_JSON)
-                        .characterEncoding("UTF-8")
                         .content(jsonPessoaInvalida))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value(400))

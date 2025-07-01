@@ -35,7 +35,7 @@ public class PessoaController {
         return pessoaMapper.toDto(pessoaService.buscar(pessoaId));
     }
 
-    @PostMapping
+    @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     public PessoaDTO adicionar(@RequestBody @Valid PessoaRequest pessoaRequest) {
         return pessoaMapper.toDto(pessoaService.salvar(pessoaMapper.toEntity(pessoaRequest)));
