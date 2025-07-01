@@ -2,6 +2,7 @@ package br.com.fiquepositivo.api.controller;
 
 import br.com.fiquepositivo.api.dto.input.PessoaRequest;
 import br.com.fiquepositivo.api.dto.output.PessoaDTO;
+import br.com.fiquepositivo.api.exceptionhandler.MensagensErro;
 import br.com.fiquepositivo.api.mapper.PessoaMapper;
 import br.com.fiquepositivo.domain.exceptions.ConflitoDeDadosException;
 import br.com.fiquepositivo.domain.exceptions.IdNaoCadastradoException;
@@ -70,7 +71,7 @@ class PessoaControllerTest {
     @Test
     void testBuscarNaoEncontrado() throws Exception {
         Integer idFalse = 5;
-        String mensagemErro = String.format("Não existe pessoa com id %s.", idFalse);
+        String mensagemErro = String.format(MensagensErro.ERRO_PESSOA_NAO_ENCONTRADA, idFalse);
 
         when(pessoaService.buscar(idFalse)).thenThrow(
                 new IdNaoCadastradoException(mensagemErro));
@@ -122,7 +123,7 @@ class PessoaControllerTest {
     void testAtualizarNaoEncontrado() throws Exception {
         Integer idInvalido = 1;
         PessoaRequest pessoaInput = new PessoaRequest("Marcelo", 3500.0, "Operador de máquinas");
-        String mensagemErro = String.format("Não existe pessoa com id %s.", idInvalido);
+        String mensagemErro = String.format(MensagensErro.ERRO_PESSOA_NAO_ENCONTRADA, idInvalido);
         when(pessoaMapper.toDto(any())).thenThrow(new IdNaoCadastradoException(mensagemErro));
 
         mockMvc.perform(put("/pessoas/{id}", idInvalido).contentType(MediaType.APPLICATION_JSON)
@@ -158,7 +159,7 @@ class PessoaControllerTest {
     void testAtualizarParcialmenteNaoEncontrado() throws Exception {
         Integer idInvalido = 1;
         String jsonParcial = "{ \"profissao\": \"Analista\" }";
-        String mensagemErro = String.format("Não existe pessoa com id %s.", idInvalido);
+        String mensagemErro = String.format(MensagensErro.ERRO_PESSOA_NAO_ENCONTRADA, idInvalido);
 
         when(pessoaService.atualizarParcialmente(eq(idInvalido), anyMap())).thenThrow(
                 new IdNaoCadastradoException(mensagemErro));
@@ -183,7 +184,7 @@ class PessoaControllerTest {
     @Test
     void testExcluirNaoEncontrado() throws Exception {
         Integer idInvalido = 1;
-        String mensagemErro = String.format("Não existe pessoa com id %s.", idInvalido);
+        String mensagemErro = String.format(MensagensErro.ERRO_PESSOA_NAO_ENCONTRADA, idInvalido);
         doThrow(new IdNaoCadastradoException(mensagemErro)).when(pessoaService).excluir(idInvalido);
         mockMvc.perform(delete("/pessoas/{id}", idInvalido)).andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status").value(404))
@@ -196,7 +197,7 @@ class PessoaControllerTest {
     void testExcluirConflito() throws Exception {
         Integer idConflito = 2;
         String mensagemErro =
-                String.format("A pessoa com o id %s não pode ser excluída porque existe gasto/s vinculado/s a ela.",
+                String.format(MensagensErro.ERRO_CONFLITO_PESSOA,
                         idConflito);
         doThrow(new ConflitoDeDadosException(mensagemErro)).when(pessoaService).excluir(idConflito);
         mockMvc.perform(delete("/pessoas/{id}", idConflito)).andExpect(status().isConflict())

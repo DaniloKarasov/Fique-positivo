@@ -1,5 +1,6 @@
 package br.com.fiquepositivo.domain.service;
 
+import br.com.fiquepositivo.api.exceptionhandler.MensagensErro;
 import br.com.fiquepositivo.domain.exceptions.ConflitoDeDadosException;
 import br.com.fiquepositivo.domain.exceptions.IdNaoCadastradoException;
 import br.com.fiquepositivo.domain.model.Pessoa;
@@ -29,7 +30,7 @@ public class PessoaService {
 
     public Pessoa buscar(Integer pessoaId) {
         return pessoaRepository.findById(pessoaId).orElseThrow(
-                () -> new IdNaoCadastradoException(String.format("Não existe pessoa com id %s.", pessoaId)));
+                () -> new IdNaoCadastradoException(String.format(MensagensErro.ERRO_PESSOA_NAO_ENCONTRADA, pessoaId)));
     }
 
     public Pessoa salvar(Pessoa pessoa) {
@@ -64,8 +65,7 @@ public class PessoaService {
 
         } catch (DataIntegrityViolationException e) {
             throw new ConflitoDeDadosException(
-                    String.format("A pessoa com o id %s não pode ser excluída porque existe gasto/s vinculado/s a ela.",
-                            pessoaId));
+                    String.format(MensagensErro.ERRO_CONFLITO_PESSOA, pessoaId));
         }
     }
 }

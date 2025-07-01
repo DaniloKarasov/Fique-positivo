@@ -1,16 +1,17 @@
 package br.com.fiquepositivo.api.dto.input;
 
+import br.com.fiquepositivo.api.exceptionhandler.MensagensErro;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
 public record PessoaRequest(
 
-        @NotBlank(message = "O nome é obrigatório.")
+        @NotBlank(message = MensagensErro.VALIDACAO_NOME_PESSOA_FALTANDO)
         String nome,
 
-        @NotNull(message = "O campo renda mensal não pode ser nulo.")
-        @Positive(message = "O campo renda mensal não pode ser negativo.")
+        @NotNull(message = MensagensErro.VALIDACAO_RENDA_NULA)
+        @Positive(message = MensagensErro.VALIDACAO_RENDA_NEGATIVA)
         Double rendaMensal,
 
         String profissao

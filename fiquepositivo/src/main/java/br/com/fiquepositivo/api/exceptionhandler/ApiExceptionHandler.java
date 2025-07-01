@@ -6,7 +6,6 @@ import br.com.fiquepositivo.domain.exceptions.IdNaoCadastradoException;
 import br.com.fiquepositivo.domain.exceptions.PessoaNaoEncontradaException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
@@ -42,7 +41,7 @@ public class ApiExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorResponse> tratarHttpMessageNotReadableException() {
         return ResponseEntity.badRequest()
-                .body(criarErrorResponse(HttpStatus.BAD_REQUEST, "Erro de sintaxe no JSON enviado."));
+                .body(criarErrorResponse(HttpStatus.BAD_REQUEST, MensagensErro.ERRO_JSON_MAL_FORMADO));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -60,7 +59,7 @@ public class ApiExceptionHandler {
     public ResponseEntity<ErrorResponse> tratarDataIntegrityViolationException(DataIntegrityViolationException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(criarErrorResponse(HttpStatus.BAD_REQUEST,
-                        "Um ou mais campos obrigatórios não foram preenchidos ou os dados são inconsistentes."));
+                        MensagensErro.ERRO_CAMPOS_INVALIDOS));
     }
 
     private ErrorResponse criarErrorResponse(HttpStatus status, String message) {

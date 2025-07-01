@@ -1,5 +1,6 @@
 package br.com.fiquepositivo.domain.service;
 
+import br.com.fiquepositivo.api.exceptionhandler.MensagensErro;
 import br.com.fiquepositivo.domain.exceptions.IdNaoCadastradoException;
 import br.com.fiquepositivo.domain.exceptions.PessoaNaoEncontradaException;
 import br.com.fiquepositivo.domain.model.Gasto;
@@ -26,7 +27,7 @@ public class GastoService {
 
     public Gasto buscar(Integer gastoId) {
         return gastoRepository.findById(gastoId)
-                .orElseThrow(() -> new IdNaoCadastradoException(String.format("Não existe gasto com id %s.", gastoId)));
+                .orElseThrow(() -> new IdNaoCadastradoException(String.format(MensagensErro.ERRO_GASTO_NAO_ENCONTRADO, gastoId)));
     }
 
     public Gasto salvar(Gasto gasto) {
@@ -34,7 +35,7 @@ public class GastoService {
         try {
             pessoaService.buscar(pessoaId);
         } catch (IdNaoCadastradoException e) {
-            throw new PessoaNaoEncontradaException(String.format("Não foi encontrada pessoa com id %s.", pessoaId));
+            throw new PessoaNaoEncontradaException(String.format(MensagensErro.ERRO_PESSOA_NAO_ENCONTRADA, pessoaId));
         }
         return gastoRepository.save(gasto);
     }

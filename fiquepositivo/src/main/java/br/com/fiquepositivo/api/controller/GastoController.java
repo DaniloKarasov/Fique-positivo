@@ -4,6 +4,7 @@ import br.com.fiquepositivo.api.dto.input.GastoRequest;
 import br.com.fiquepositivo.api.dto.output.GastoDTO;
 import br.com.fiquepositivo.api.mapper.GastoMapper;
 import br.com.fiquepositivo.domain.service.GastoService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,12 +35,12 @@ public class GastoController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public GastoDTO adicionar(@RequestBody GastoRequest gastoRequest) {
+    public GastoDTO adicionar(@RequestBody @Valid GastoRequest gastoRequest) {
         return gastoMapper.toDto(gastoService.salvar(gastoMapper.toEntity(gastoRequest)));
     }
 
     @PutMapping("/{gastoId}")
-    public GastoDTO atualizar(@PathVariable Integer gastoId, @RequestBody GastoRequest gastoRequest) {
+    public GastoDTO atualizar(@PathVariable Integer gastoId, @RequestBody @Valid GastoRequest gastoRequest) {
         return gastoMapper.toDto(gastoService.atualizar(gastoId, gastoMapper.toEntity(gastoRequest)));
     }
 
