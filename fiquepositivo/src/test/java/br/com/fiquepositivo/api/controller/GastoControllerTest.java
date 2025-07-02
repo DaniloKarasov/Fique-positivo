@@ -2,6 +2,7 @@ package br.com.fiquepositivo.api.controller;
 
 import br.com.fiquepositivo.api.dto.input.GastoRequest;
 import br.com.fiquepositivo.api.dto.output.GastoDTO;
+import br.com.fiquepositivo.api.exceptionhandler.MensagensErro;
 import br.com.fiquepositivo.api.mapper.GastoMapper;
 import br.com.fiquepositivo.domain.exceptions.IdNaoCadastradoException;
 import br.com.fiquepositivo.domain.model.FormaPagamento;
@@ -13,17 +14,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(GastoController.class)
@@ -73,26 +71,87 @@ class GastoControllerTest {
     @Test
     void testBuscarNaoEncontrado() throws Exception {
         Integer idInvalido = 3;
-        String mensagemErro = "Não existe gasto com id %s.";
+        String mensagemErro = String.format(MensagensErro.ERRO_GASTO_NAO_ENCONTRADO, idInvalido);
 
         when(gastoService.buscar(idInvalido)).thenThrow(new IdNaoCadastradoException(mensagemErro));
 
         mockMvc.perform(get("/gastos/{id}", idInvalido)).andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.status").value(404));
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.message").value(mensagemErro));
     }
 
     @Test
-    void adicionar() {
-        Integer num = 2;
-        System.out.println("teste %s teste, num");
+    void testAdicionar() throws Exception {
+
+        GastoRequest gastoInput = criarGastoRequest();
+        Gasto gastoEntity = criarGasto(1);
+        GastoDTO gastoDTO = criarGastoDTO(1);
+
+        when(gastoMapper.toEntity(gastoInput)).thenReturn(gastoEntity);
+        when(gastoService.salvar(gastoEntity)).thenReturn(gastoEntity);
+        when(gastoMapper.toDto(gastoEntity)).thenReturn(gastoDTO);
+
+        mockMvc.perform(post("/gastos").contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(gastoInput)))
+                .andExpect(status().isCreated())
+                .andExpect(content().json(objectMapper.writeValueAsString(gastoDTO)));
+
     }
 
     @Test
-    void atualizar() {
+    void atualizar() throws Exception {
+        Integer id = 1;
+        GastoDTO gastoDTO = criarGastoDTO(id);
+        Gasto gastoEntity = criarGasto(id);
+        GastoRequest gastoRequest = criarGastoRequest();
+
+        when(gastoMapper.toEntity(gastoRequest)).thenReturn(gastoEntity);
+        when(gastoService.atualizar(id, gastoEntity)).thenReturn(gastoEntity);
+        when(gastoMapper.toDto(gastoEntity)).thenReturn(gastoDTO);
+
+        mockMvc.perform(put("/gastos/{id}", id).contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(gastoRequest))).andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(gastoDTO)));
     }
 
     @Test
-    void excluir() {
+    void testAtualizarNaoEncontrado() throws Exception {
+        Integer idInvalido = 2;
+        GastoRequest gastoRequest = criarGastoRequest();
+        Gasto gastoEntity = criarGasto(null);
+
+        when(gastoMapper.toEntity(gastoRequest)).thenReturn(gastoEntity);
+        when(gastoService.atualizar(idInvalido, gastoEntity)).thenThrow(
+                new IdNaoCadastradoException(String.format(MensagensErro.ERRO_GASTO_NAO_ENCONTRADO, idInvalido)));
+
+        mockMvc.perform(put("/gastos/{id}", idInvalido).contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(gastoRequest))).andExpect(status().isNotFound())
+                .andExpect(
+                        jsonPath("$.message").value(String.format(MensagensErro.ERRO_GASTO_NAO_ENCONTRADO, idInvalido)));
+    }
+
+    @Test
+    void testExcluir() throws Exception {
+        Integer id = 1;
+
+        doNothing().when(gastoService).excluir(id);
+
+        mockMvc.perform(delete("/gastos/{id}", id)).andExpect(status().isNoContent()).andExpect(content().string(""));
+        ;
+
+        verify(gastoService).excluir(id);
+    }
+
+    @Test
+    void testExcluirNaoEncontrado() throws Exception {
+        Integer idInvalido = 2;
+
+        doThrow(new IdNaoCadastradoException(String.format(MensagensErro.ERRO_GASTO_NAO_ENCONTRADO, idInvalido))).when(
+                gastoService).excluir(idInvalido);
+
+        mockMvc.perform(delete("/gastos/{id}", idInvalido)).andExpect(status().isNotFound());
+
+        verify(gastoService).excluir(idInvalido);
     }
 
     private Gasto criarGasto(Integer id) {
@@ -105,7 +164,7 @@ class GastoControllerTest {
                 "Goiânia", "Notebook", true, 1);
     }
 
-    private GastoRequest criarGastoRequest(Integer id) {
+    private GastoRequest criarGastoRequest() {
         return new GastoRequest(3000.0, FormaPagamento.PIX, LocalDate.of(2023, 3, 28),
                 "Goiânia", "Notebook", true, 1);
     }
