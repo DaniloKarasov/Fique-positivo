@@ -3,6 +3,7 @@ package br.com.fiquepositivo.domain.service;
 import br.com.fiquepositivo.domain.exceptions.IdNaoCadastradoException;
 import br.com.fiquepositivo.domain.model.Pessoa;
 import br.com.fiquepositivo.domain.repository.PessoaRepository;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -27,6 +28,7 @@ class PessoaServiceTest {
     @InjectMocks
     PessoaService pessoaService;
 
+    @DisplayName("Deve retornar um List<Pessoa>")
     @Test
     void testListar() {
         Pessoa pessoa1 = new Pessoa(1, "Fábio", 5000.0, "Analista de sistemas");
@@ -40,6 +42,7 @@ class PessoaServiceTest {
         assertEquals(pessoaList, result);
     }
 
+    @DisplayName("Deve retornar uma Pessoa")
     @Test
     void testBuscar() {
         Integer id = 1;
@@ -52,6 +55,18 @@ class PessoaServiceTest {
         assertEquals(pessoa, result);
     }
 
+    @DisplayName("Deve lançar IdNaoCadastradoException ao buscar pessoa com id inválido")
+    @Test
+    void testBuscarNaoEncontrado() {
+        Integer idInexistente = 4;
+
+        when(pessoaRepository.findById(idInexistente)).thenReturn(Optional.empty());
+        assertThrows(IdNaoCadastradoException.class, () -> pessoaService.buscar(idInexistente));
+
+        verify(pessoaRepository).findById(idInexistente);
+    }
+
+    @DisplayName("Deve retornar a pessoa salva")
     @Test
     void testSalvar() {
         Pessoa pessoa = new Pessoa(null, "Fábio", 5000.0, "Analista de sistemas");
@@ -64,8 +79,9 @@ class PessoaServiceTest {
         assertEquals(pessoaSalva, result);
     }
 
+    @DisplayName("Deve retornar a pessoa atualizada")
     @Test
-    void atualizar() {
+    void testAtualizar() {
         Integer id = 1;
         Pessoa pessoaExistente = new Pessoa(id, "Fábio", 5000.0, "Analista de sistemas");
         Pessoa novosDados = new Pessoa(null, "Fábio Augusto", 5500.0, "Engenheiro de software");
@@ -79,8 +95,21 @@ class PessoaServiceTest {
         assertEquals(pessoaAtualizada, result);
     }
 
+    @DisplayName("Deve lançar IdNaoCadastradoException ao tentar atualizar pessoa com id inexistente")
     @Test
-    void atualizarParcialmente() {
+    void testAtualizarNaoEncontrado() {
+        Integer idInexistente = 3;
+        Pessoa pessoa = new Pessoa(1, "Fábio", 5000.0, "Analista de sistemas");
+
+        when(pessoaRepository.findById(idInexistente)).thenReturn(Optional.empty());
+        assertThrows(IdNaoCadastradoException.class, () -> pessoaService.atualizar(idInexistente, pessoa));
+
+        verify(pessoaRepository, never()).save(any(Pessoa.class));
+    }
+
+    @DisplayName("Deve retornar a pessoa atualizada parcialmente")
+    @Test
+    void testAtualizarParcialmente() {
         Integer id = 1;
         Pessoa pessoaExistente = new Pessoa(id, "Fábio", 5000.0, "Analista de sistemas");
         Map<String, Object> dados = new HashMap<>();
@@ -96,8 +125,24 @@ class PessoaServiceTest {
         assertEquals(pessoaAtualizada, result);
     }
 
+    @DisplayName("Deve lançar IdNaoCadastradoException ao atualizar parcialmente com id inexistente")
     @Test
-    void excluir() {
+    void testAtualizarParcialmenteNaoEncontrado() {
+        Integer idInexistente = 2;
+        Map<String, Object> dados = new HashMap<>();
+        dados.put("profissao", null);
+        dados.put("rendaMensal", 200.0);
+
+        when(pessoaRepository.findById(idInexistente)).thenReturn(Optional.empty());
+
+        assertThrows(IdNaoCadastradoException.class, () -> pessoaService.atualizarParcialmente(idInexistente, dados));
+        verify(pessoaRepository, times(1)).findById(idInexistente);
+        verify(pessoaRepository, never()).save(any(Pessoa.class));
+    }
+
+    @DisplayName("Deve excluir uma pessoa e não retornar nada")
+    @Test
+    void testExcluir() {
         Integer id = 1;
         Pessoa pessoa = new Pessoa(id, "Fábio", 5000.0, "Analista de sistemas");
 
@@ -111,13 +156,14 @@ class PessoaServiceTest {
 
     }
 
+    @DisplayName("Deve lançar IdNaoCadastradoException ao excluir uma pessoa com id inexistente")
     @Test
-    void testExcluirIdInvalido() {
-        Integer id = 4;
+    void testExcluirNaoEncontrado() {
+        Integer idInexistente = 4;
 
-        when(pessoaRepository.findById(id)).thenReturn(Optional.empty());
+        when(pessoaRepository.findById(idInexistente)).thenReturn(Optional.empty());
 
-        assertThrows(IdNaoCadastradoException.class, () -> pessoaService.excluir(id));
+        assertThrows(IdNaoCadastradoException.class, () -> pessoaService.excluir(idInexistente));
         verify(pessoaRepository, never()).delete(any());
     }
 }

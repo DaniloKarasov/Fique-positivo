@@ -10,6 +10,7 @@ import br.com.fiquepositivo.domain.model.Gasto;
 import br.com.fiquepositivo.domain.model.Pessoa;
 import br.com.fiquepositivo.domain.service.GastoService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -39,6 +40,7 @@ class GastoControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @DisplayName("Deve retornar uma lista de gastos e status 200")
     @Test
     void testListar() throws Exception {
         List<Gasto> listEntity = List.of(criarGasto(1), criarGasto(2));
@@ -53,6 +55,7 @@ class GastoControllerTest {
 
     }
 
+    @DisplayName("Deve retornar um gasto no corpo e status 200")
     @Test
     void testBuscar() throws Exception {
         Integer id = 1;
@@ -68,6 +71,7 @@ class GastoControllerTest {
         verify(gastoMapper).toDto(gasto);
     }
 
+    @DisplayName("Deve retornar status 404 e mensagem no corpo (GET)")
     @Test
     void testBuscarNaoEncontrado() throws Exception {
         Integer idInvalido = 3;
@@ -80,6 +84,7 @@ class GastoControllerTest {
                 .andExpect(jsonPath("$.message").value(mensagemErro));
     }
 
+    @DisplayName("Deve retornar status 201 e o gasto salvo no corpo")
     @Test
     void testAdicionar() throws Exception {
 
@@ -98,6 +103,7 @@ class GastoControllerTest {
 
     }
 
+    @DisplayName("Deve retornar o gasto atualizado no corpo e status 200")
     @Test
     void atualizar() throws Exception {
         Integer id = 1;
@@ -114,6 +120,7 @@ class GastoControllerTest {
                 .andExpect(content().json(objectMapper.writeValueAsString(gastoDTO)));
     }
 
+    @DisplayName("Deve retornar status 404 e mensagem de erro no corpo (PUT)")
     @Test
     void testAtualizarNaoEncontrado() throws Exception {
         Integer idInvalido = 2;
@@ -127,9 +134,11 @@ class GastoControllerTest {
         mockMvc.perform(put("/gastos/{id}", idInvalido).contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(gastoRequest))).andExpect(status().isNotFound())
                 .andExpect(
-                        jsonPath("$.message").value(String.format(MensagensErro.ERRO_GASTO_NAO_ENCONTRADO, idInvalido)));
+                        jsonPath("$.message").value(
+                                String.format(MensagensErro.ERRO_GASTO_NAO_ENCONTRADO, idInvalido)));
     }
 
+    @DisplayName("Deve retornar status 204")
     @Test
     void testExcluir() throws Exception {
         Integer id = 1;
@@ -142,6 +151,7 @@ class GastoControllerTest {
         verify(gastoService).excluir(id);
     }
 
+    @DisplayName("Deve retornar status 404 e mensagem de erro no corpo (DELETE)")
     @Test
     void testExcluirNaoEncontrado() throws Exception {
         Integer idInvalido = 2;

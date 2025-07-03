@@ -5,6 +5,7 @@ import br.com.fiquepositivo.api.dto.output.GastoDTO;
 import br.com.fiquepositivo.domain.model.FormaPagamento;
 import br.com.fiquepositivo.domain.model.Gasto;
 import br.com.fiquepositivo.domain.model.Pessoa;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -22,6 +23,7 @@ class GastoMapperTest {
     @InjectMocks
     GastoMapper gastoMapper;
 
+    @DisplayName("Deve converter GastoRequest em Gasto")
     @Test
     void testToEntity() {
         GastoRequest gastoRequest =
@@ -42,6 +44,7 @@ class GastoMapperTest {
         assertNull(gasto.getPessoa().getProfissao());
     }
 
+    @DisplayName("Deve converter Gasto em GastoDTO")
     @Test
     void testToDto() {
         Gasto gasto =
@@ -62,6 +65,7 @@ class GastoMapperTest {
 
     }
 
+    @DisplayName("Deve converter List<Gasto> em List<GastoDTO>")
     @Test
     void testToDtoList() {
         Gasto gasto1 =

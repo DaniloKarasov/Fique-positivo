@@ -8,6 +8,7 @@ import br.com.fiquepositivo.domain.exceptions.ConflitoDeDadosException;
 import br.com.fiquepositivo.domain.exceptions.IdNaoCadastradoException;
 import br.com.fiquepositivo.domain.service.PessoaService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -40,6 +41,7 @@ class PessoaControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @DisplayName("Deve retornar status 200 e uma lista de pessoas")
     @Test
     void testListar() throws Exception {
         PessoaDTO pessoaDto1 = new PessoaDTO(1, "Renato", 3500.0, "Segurança");
@@ -55,6 +57,7 @@ class PessoaControllerTest {
 
     }
 
+    @DisplayName("Deve retornar status 200 e uma pessoa no corpo")
     @Test
     void testBuscar() throws Exception {
         Integer id = 3;
@@ -69,6 +72,7 @@ class PessoaControllerTest {
         verify(pessoaMapper).toDto(any());
     }
 
+    @DisplayName("Deve retornar status 404 e mensagem de erro no corpo (GET)")
     @Test
     void testBuscarNaoEncontrado() throws Exception {
         Integer idFalse = 5;
@@ -83,6 +87,7 @@ class PessoaControllerTest {
                 .andExpect(jsonPath("$.message").value(mensagemErro));
     }
 
+    @DisplayName("Deve retornar status 201 e a pessoa salva no corpo")
     @Test
     void testAdicionar() throws Exception {
         PessoaRequest pessoaInput = new PessoaRequest("Sara", 2000.0, "Farmaceutica");
@@ -100,6 +105,7 @@ class PessoaControllerTest {
 
     }
 
+    @DisplayName("Deve retornar status 200 e a pessoa atualizada no corpo")
     @Test
     void testAtualizar() throws Exception {
         Integer id = 1;
@@ -120,6 +126,7 @@ class PessoaControllerTest {
 
     }
 
+    @DisplayName("Deve retornar status 404 e mensagem de erro no corpo (PUT)")
     @Test
     void testAtualizarNaoEncontrado() throws Exception {
         Integer idInvalido = 1;
@@ -136,6 +143,7 @@ class PessoaControllerTest {
         verify(pessoaMapper).toDto(any());
     }
 
+    @DisplayName("Deve retornar status 200 e pessoa atualizada parcialmente no corpo")
     @Test
     void testAtualizarParcialmente() throws Exception {
         Integer id = 1;
@@ -156,6 +164,7 @@ class PessoaControllerTest {
         verify(pessoaService).atualizarParcialmente(eq(id), anyMap());
     }
 
+    @DisplayName("Deve retornar status 404 e mensagem de erro no corpo (PATCH)")
     @Test
     void testAtualizarParcialmenteNaoEncontrado() throws Exception {
         Integer idInvalido = 1;
@@ -173,6 +182,7 @@ class PessoaControllerTest {
         verify(pessoaService).atualizarParcialmente(eq(idInvalido), anyMap());
     }
 
+    @DisplayName("Deve retornar status 204")
     @Test
     void testExcluir() throws Exception {
         Integer id = 1;
@@ -182,6 +192,7 @@ class PessoaControllerTest {
         verify(pessoaService).excluir(id);
     }
 
+    @DisplayName("Deve retornar status 404 e mensagem de erro no corpo (DELETE)")
     @Test
     void testExcluirNaoEncontrado() throws Exception {
         Integer idInvalido = 1;
@@ -194,6 +205,7 @@ class PessoaControllerTest {
         verify(pessoaService).excluir(idInvalido);
     }
 
+    @DisplayName("Deve retornar status 409 e mensagem de erro no corpo")
     @Test
     void testExcluirConflito() throws Exception {
         Integer idConflito = 2;
@@ -207,6 +219,7 @@ class PessoaControllerTest {
         verify(pessoaService).excluir(idConflito);
     }
 
+    @DisplayName("Deve retornar status 400 e mensagem de erro no corpo sobre erro de sintaxe no json")
     @Test
     void testErroSintaxeJson() throws Exception {
         String jsonMalFormado = "{\n" +
@@ -221,6 +234,7 @@ class PessoaControllerTest {
                 .andExpect(jsonPath("$.message").value(mensagemErro));
     }
 
+    @DisplayName("Deve retornar status 400 e mensagem de erro para cada campo inválido")
     @Test
     void deveRetornarErrosDeValidacaoQuandoCamposInvalidos() throws Exception {
         // JSON com campos inválidos (nome em branco e rendaMensal negativa)

@@ -3,6 +3,7 @@ package br.com.fiquepositivo.api.mapper;
 import br.com.fiquepositivo.api.dto.input.PessoaRequest;
 import br.com.fiquepositivo.api.dto.output.PessoaDTO;
 import br.com.fiquepositivo.domain.model.Pessoa;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -10,7 +11,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 @ExtendWith(MockitoExtension.class)
 class PessoaMapperTest {
@@ -18,6 +20,7 @@ class PessoaMapperTest {
     @InjectMocks
     PessoaMapper pessoaMapper;
 
+    @DisplayName("Deve converter uma PessoaRequest em Pessoa")
     @Test
     void testToEntity() {
         PessoaRequest pessoaRequest = new PessoaRequest("Renan", 3000.0, "pedreiro");
@@ -31,6 +34,7 @@ class PessoaMapperTest {
 
     }
 
+    @DisplayName("Deve converter Pessoa em PessoaDTO")
     @Test
     void testToDto() {
         Pessoa pessoa = new Pessoa(2, "Carlos", 2500.0, "Cuidador");
@@ -43,6 +47,7 @@ class PessoaMapperTest {
         assertEquals(pessoa.getProfissao(), pessoaDTO.profissao());
     }
 
+    @DisplayName("Deve converter List<Pessoa> em List<PessoaDTO>")
     @Test
     void testToDtoList() {
         Pessoa pessoa1 = new Pessoa(1, "André", 5000.0, "Jogador");
