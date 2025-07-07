@@ -1,7 +1,11 @@
 package br.com.fiquepositivo.api.controller;
 
+import br.com.fiquepositivo.api.dto.input.PessoaRequest;
+import br.com.fiquepositivo.api.dto.output.PessoaDTO;
+import br.com.fiquepositivo.api.mapper.PessoaMapper;
 import br.com.fiquepositivo.domain.model.Pessoa;
 import br.com.fiquepositivo.domain.service.PessoaService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,37 +18,37 @@ public class PessoaController {
 
     private final PessoaService pessoaService;
 
-    public PessoaController(PessoaService pessoaService) {
+    private final PessoaMapper pessoaMapper;
+
+    public PessoaController(PessoaService pessoaService, PessoaMapper pessoaMapper) {
         this.pessoaService = pessoaService;
+        this.pessoaMapper = pessoaMapper;
     }
 
     @GetMapping
-    public List<Pessoa> listar() {
-        return pessoaService.listar();
+    public List<PessoaDTO> listar() {
+        return pessoaMapper.toDtoList(pessoaService.listar());
     }
 
     @GetMapping("/{pessoaId}")
-    public Pessoa buscar(@PathVariable Integer pessoaId) {
-        return pessoaService.buscar(pessoaId);
+    public PessoaDTO buscar(@PathVariable Integer pessoaId) {
+        return pessoaMapper.toDto(pessoaService.buscar(pessoaId));
     }
 
-    @PostMapping
+    @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
-    public Pessoa adicionar(@RequestBody Pessoa pessoa) {
-        return pessoaService.salvar(pessoa);
+    public PessoaDTO adicionar(@RequestBody @Valid PessoaRequest pessoaRequest) {
+        return pessoaMapper.toDto(pessoaService.salvar(pessoaMapper.toEntity(pessoaRequest)));
     }
 
     @PutMapping("/{pessoaId}")
-    public Pessoa atualizar(@PathVariable Integer pessoaId, @RequestBody Pessoa pessoa) {
-        pessoa = pessoaService.atualizar(pessoaId, pessoa);
-        return pessoa;
+    public PessoaDTO atualizar(@PathVariable Integer pessoaId, @RequestBody @Valid PessoaRequest pessoaRequest) {
+        return pessoaMapper.toDto(pessoaService.atualizar(pessoaId, pessoaMapper.toEntity(pessoaRequest)));
     }
 
     @PatchMapping("/{pessoaId}")
-    public Pessoa atualizarParcialmente(@PathVariable Integer pessoaId,
-                                        @RequestBody Map<String, Object> dados) {
-        Pessoa pessoa = pessoaService.atualizarParcialmente(pessoaId, dados);
-        return pessoa;
+    public PessoaDTO atualizarParcialmente(@PathVariable Integer pessoaId, @RequestBody Map<String, Object> dados) {
+        return pessoaMapper.toDto(pessoaService.atualizarParcialmente(pessoaId, dados));
     }
 
     @DeleteMapping("/{pessoaId}")
