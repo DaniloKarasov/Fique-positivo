@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
@@ -92,7 +93,7 @@ class PessoaServiceTest {
 
         Pessoa result = pessoaService.atualizar(id, novosDados);
 
-        assertEquals(pessoaAtualizada, result);
+        assertThat(pessoaAtualizada).usingRecursiveComparison().isEqualTo(result);
     }
 
     @DisplayName("Deve lançar IdNaoCadastradoException ao tentar atualizar pessoa com id inexistente")
@@ -122,7 +123,7 @@ class PessoaServiceTest {
 
         Pessoa result = pessoaService.atualizarParcialmente(id, dados);
 
-        assertEquals(pessoaAtualizada, result);
+        assertThat(pessoaAtualizada).usingRecursiveComparison().isEqualTo(result);
     }
 
     @DisplayName("Deve lançar IdNaoCadastradoException ao atualizar parcialmente com id inexistente")
