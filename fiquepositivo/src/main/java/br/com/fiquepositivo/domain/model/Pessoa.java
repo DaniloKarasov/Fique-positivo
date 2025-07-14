@@ -1,10 +1,6 @@
 package br.com.fiquepositivo.domain.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -21,12 +17,12 @@ public class Pessoa {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@EqualsAndHashCode.Include
 	private Integer id;
-	
+
 	@Column(nullable = false, length = 60)
 	private String nome;
-	
+
 	@Column(nullable = false)
-	private Double RendaMensal;
+	private Double rendaMensal;
 	
 	@Column(length = 60)
 	private String profissao;
